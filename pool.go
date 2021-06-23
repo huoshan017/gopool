@@ -15,11 +15,11 @@ type task struct {
 	fun   func(interface{}) interface{}
 }
 
-// 协程池
+// 线程安全的协程池
 type Pool struct {
-	taskCh    chan *task    // 传递任务
+	taskCh    chan *task    // 传递任务，这个通道是多写多读
 	countCh   chan struct{} // 用于计数
-	goTimeout int           // 超时：秒
+	goTimeout int           // 协程执行完退出超时：秒
 }
 
 // 新建协程池
@@ -35,9 +35,10 @@ func NewPool(s int) *Pool {
 // 提交任务
 func (p *Pool) CommitTask(ctx context.Context, f func(interface{}) interface{}, param interface{}) {
 	select {
+		// 进行计数，如果阻塞则说明协程数已达最大，等待有协程执行完释放
 	case p.countCh <- struct{}{}:
 		go p.addCandidate(ctx, &task{fun: f, param: param})
-		// 只有在p.semCh满的情况下才会跑到下面来
+		// 只有上面阻塞时才会跑到下面来，如果已经有一个协程在运行了，会通过taskCh通道获取到该任务，协程会继续运行
 	case p.taskCh <- &task{fun: f, param: param}:
 	}
 }
