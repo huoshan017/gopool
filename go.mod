@@ -1,3 +1,3 @@
-module huoshan017/gopool
+module github.com/huoshan017/gopool
 
 go 1.16
