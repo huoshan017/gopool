@@ -12,7 +12,7 @@ const (
 // 任务
 type task struct {
 	param interface{}
-	fun   func(interface{}) interface{}
+	fun   func(interface{})
 }
 
 // 线程安全的协程池
@@ -33,7 +33,7 @@ func NewPool(s int) *Pool {
 }
 
 // 提交任务
-func (p *Pool) CommitTask(ctx context.Context, f func(interface{}) interface{}, param interface{}) {
+func (p *Pool) CommitTask(ctx context.Context, f func(interface{}), param interface{}) {
 	select {
 		// 进行计数，如果阻塞则说明协程数已达最大，等待有协程执行完释放
 	case p.countCh <- struct{}{}:

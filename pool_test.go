@@ -17,11 +17,10 @@ func TestGoPool(t *testing.T) {
 	wg.Add(count)
 
 	for i := 0; i < count; i++ {
-		pool.CommitTask(ctx, func(a interface{}) interface{} {
+		pool.CommitTask(ctx, func(a interface{}) {
 			aa := a.(int)
 			t.Logf("ok %v", aa)
 			wg.Done()
-			return nil
 		}, i)
 	}
 
